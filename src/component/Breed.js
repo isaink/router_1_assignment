@@ -79,7 +79,7 @@ export default class Breed extends React.Component {
                 />
               </form>
     
-              {imgUrl ? <Image imgUrl={imgUrl} /> : null}
+              {imgUrl ? <Image imgUrl={imgUrl} addNewFavorite={this.props.addNewFavorite} /> : null}
             </React.Fragment>
           );
         }
