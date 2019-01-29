@@ -1,61 +1,86 @@
 import React from 'react';
 import Axios from 'axios';
+import Image from "./Image";
 
 export default class Breed extends React.Component {
     constructor(){
         super();
         this.state = {
-            dogBreed: '',
-            url:  [],
-            imgs: [],
-
+            selectedBreed: '', 
+            imgUrl:  [], 
+            allBreeds: [], 
         }
     };
 
-    getBreeds = () => {
+    getAllBreeds = () => {
         Axios.get('https://dog.ceo/api/breeds/list/all').then( res => {
             this.setState({
-                imgs:  Object.keys(res.data.message),
+                allBreeds:  Object.keys(res.data.message), //extract all the keys for the obj
             })
         }).catch(err => {
             console.log(err, "Error fetching Breed");
           });
     };
     
-    showBreed = (id) => {
-        Axios.get(`https://dog.ceo/api/breed/${this.state.dogBreed}/images/random`).then( res => {
+    showBreed = () => {
+        const { selectedBreed } = this.state;
+        Axios.get(`https://dog.ceo/api/breed/${selectedBreed}/images/random`).then( res => {
             this.setState({
-                url: res.data.message ,
+                imgUrl: res.data.message ,
             })
         }).catch(err => {
             console.log(err, "Error fetching image");
         })
     };
-    handleChange = (e) => {
+
+    handleSelect = e => {
         this.setState({
-            dogBreed: e.target.value,
-        })
+          [e.target.name]: e.target.value
+        });
     };
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.showBreed();
+
+    };
+
     componentDidMount(){
-        this.getBreeds();
-    }
+        this.getAllBreeds();
+    };
 
     render(){
-        return (
-            <>  
-                <header> 
-                    <h3>Random dog's breed</h3>
-                </header>
 
-                <select onChange={this.handleChange} placeholder="Breed's Dogs" >
-                    {this.state.imgs.map( (img, i ) => {
-                        return <option key={i} value={img}>{img} </option>
-                    })}
+        const { imgUrl, allBreeds, selectedBreed } = this.state;
+
+        let breedOptions = allBreeds.map((breed, i) => {
+                return (
+                  <option key={i + 1} value={breed}>
+                    {breed}
+                  </option>
+                )
+        });
+    
+          return (
+            <React.Fragment>
+              <form onSubmit={this.handleSubmit}>
+                <select
+                  name="selectedBreed"
+                  onChange={this.handleSelect}
+                  value={selectedBreed}
+                >
+                  <option key="0" value="" />
+                  {breedOptions}
                 </select>
-                <button onClick={this.showBreed}>Get dogs </button>
-                <img alt='' src={this.state.url} />
-        
-            </>
-        )
+                <input
+                  type="submit"
+                  value="Fetch!"
+                  disabled={selectedBreed ? false : true}
+                />
+              </form>
+    
+              {imgUrl ? <Image imgUrl={imgUrl} /> : null}
+            </React.Fragment>
+          );
+        }
     }
-}

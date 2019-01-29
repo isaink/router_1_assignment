@@ -1,23 +1,24 @@
 // -------- full-fledged app to fulfill all of your dog-image-searching desires ------
 
-import React from 'react';
+import React, { Component } from "react";
+import Image from './Image';
 // import Breed from './Breed';
 
 const axios = require("axios");
 
-class Random extends React.Component {
+class Random extends Component {
     constructor(){
         super();
         this.state = {
-            dogImage: [],
+            imgUrl: [],
         }
     };
 
     getRandomImage = () => {
         axios.get("https://dog.ceo/api/breeds/image/random")
-          .then(response => {
+          .then(resp => {
             this.setState({
-              dogImage: response.data.message
+                imgUrl: resp.data.message
             });
           })
           .catch(err => {
@@ -30,22 +31,24 @@ class Random extends React.Component {
     }
 
     render(){
-
-        return (
-            <>
-                <header> Ultimate Dog Image Fetcher </header>
-               
-                <div>
-                    <button onClick={this.getRandomImage}> {" "} one more!{" "} </button>
-                    <button> </button>
-                </div>
-                {" "}
-                <div className='imgContainer'>
-                    <img alt=" " src={this.state.dogImage} />
-                </div>
+        const { imgUrl} = this.state;
+        if(!imgUrl){
+            return <h1>Loading...</h1>
+        }else{
+            return (
+                <>
+                    <header> Ultimate Dog Image Fetcher </header>
                 
-            </>
-        )
+                    <div>
+                        <button onClick={this.getRandomImage}>  NEW DOG  </button>
+                    </div>
+
+                    <div className='imgContainer'>
+                        <Image imgUrl={imgUrl} addNewFavorite={this.props.addNewFavorite} />    
+                    </div>
+                </>
+            )
+        }
     }
-}
+};
 export default Random;
